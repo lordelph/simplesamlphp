@@ -22,6 +22,17 @@ class SimpleSAML_Module
      */
     public static function getModuleDir($module)
     {
+        //implementation of https://github.com/simplesamlphp/simplesamlphp/issues/711
+        $config = SimpleSAML_Configuration::getInstance();
+        $extraModules = $config->getString('extramodules', '');
+
+        //attempt to find module in extramodules dir
+        $moduleDir = $extraModules.'/'.$module;
+        if (!empty($extraModules) && is_dir($moduleDir)) {
+            return $moduleDir;
+        }
+
+        //otherwise default behaviour to find module in modules
         $baseDir = dirname(dirname(dirname(__FILE__))).'/modules';
         $moduleDir = $baseDir.'/'.$module;
 
@@ -88,15 +99,38 @@ class SimpleSAML_Module
      */
     public static function getModules()
     {
+        $modules = array();
 
+        //first scan extra modules dir
+        $config = SimpleSAML_Configuration::getInstance();
+        $extraModules = $config->getString('extramodules', '');
+        if (!empty($extraModules) && is_dir($extraModules)) {
+            self::scanModulesDir($extraModules, $modules);
+        }
+
+        //then the built-in dir
         $path = self::getModuleDir('.');
+        if (!is_dir($path)) {
+            //we expect this to exist...
+            throw new Exception('module directory not found at "'.$path.'".');
+        }
+        self::scanModulesDir($path, $modules);
 
+        return $modules;
+    }
+
+    /**
+     * Scans given dir and adds found modules to array if not already there
+     * @param $path
+     * @param $modules
+     * @throws Exception
+     */
+    private static function scanModulesDir($path, &$modules)
+    {
         $dh = opendir($path);
         if ($dh === false) {
             throw new Exception('Unable to open module directory "'.$path.'".');
         }
-
-        $modules = array();
 
         while (($f = readdir($dh)) !== false) {
             if ($f[0] === '.') {
@@ -107,12 +141,12 @@ class SimpleSAML_Module
                 continue;
             }
 
-            $modules[] = $f;
+            if (!in_array($f, $modules)) {
+                $modules[] = $f;
+            }
         }
 
         closedir($dh);
-
-        return $modules;
     }
 
 
