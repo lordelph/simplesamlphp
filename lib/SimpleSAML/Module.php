@@ -33,12 +33,15 @@ class SimpleSAML_Module
         }
 
         //otherwise default behaviour to find module in modules
-        $baseDir = dirname(dirname(dirname(__FILE__))).'/modules';
-        $moduleDir = $baseDir.'/'.$module;
+        $moduleDir = self::getDefaultModuleDir().'/'.$module;
 
         return $moduleDir;
     }
 
+    private static function getDefaultModuleDir()
+    {
+        return dirname(dirname(dirname(__FILE__))).'/modules';
+    }
 
     /**
      * Determine whether a module is enabled.
@@ -109,13 +112,12 @@ class SimpleSAML_Module
         }
 
         //then the built-in dir
-        $path = self::getModuleDir('.');
+        $path = self::getDefaultModuleDir();
         if (!is_dir($path)) {
             //we expect this to exist...
             throw new Exception('module directory not found at "'.$path.'".');
         }
         self::scanModulesDir($path, $modules);
-
         return $modules;
     }
 
