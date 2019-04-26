@@ -93,7 +93,7 @@ class Database
 
         // connect to any configured slaves
         $slaves = $config->getArray('database.slaves', array());
-        if (count($slaves >= 1)) {
+        if (count($slaves) >= 1) {
             foreach ($slaves as $slave) {
                 array_push(
                     $this->dbSlaves,
