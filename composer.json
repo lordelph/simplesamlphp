@@ -15,6 +15,12 @@
             "email": "olav.morken@uninett.no"
         }
     ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/lordelph/saml2.git"
+        }
+    ],
     "autoload": {
         "psr-0": {
             "SimpleSAML": "lib/"
@@ -23,8 +29,8 @@
     },
     "require": {
         "php": ">=5.3",
-        "simplesamlphp/saml2": "~1.9.1",
-        "robrichards/xmlseclibs": "~1.4.1",
+        "simplesamlphp/saml2": "dev-patch1.9.1 as 1.9.1",
+        "robrichards/xmlseclibs": "~3.0.4",
         "whitehat101/apr1-md5": "~1.0",
         "ext-SPL": "*",
         "ext-zlib": "*",

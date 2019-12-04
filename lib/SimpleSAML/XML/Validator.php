@@ -1,5 +1,8 @@
 <?php
 
+use \RobRichards\XMLSecLibs\XMLSecEnc;
+use \RobRichards\XMLSecLibs\XMLSecurityDSig;
+
 /**
  * This class implements helper functions for XML validation.
  *

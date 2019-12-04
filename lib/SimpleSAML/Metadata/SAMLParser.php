@@ -1,5 +1,6 @@
 <?php
 
+use \RobRichards\XMLSecLibs\XMLSecurityKey;
 
 /**
  * This is class for parsing of SAML 1.x and SAML 2.0 metadata.

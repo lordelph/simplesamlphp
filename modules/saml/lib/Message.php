@@ -1,5 +1,6 @@
 <?php
 
+use \RobRichards\XMLSecLibs\XMLSecurityKey;
 
 /**
  * Common code for building SAML 2 messages based on the

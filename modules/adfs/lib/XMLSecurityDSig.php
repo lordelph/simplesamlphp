@@ -1,5 +1,7 @@
 <?php
 
+use \RobRichards\XMLSecLibs\XMLSecurityDSig;
+
 /**
  * This class should be considered a temporary workaround to
  * solve the lack of custom formatting in XMLSecurityDSig
