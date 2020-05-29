@@ -77,13 +77,26 @@ class SimpleSAML_SessionHandlerPHP extends SimpleSAML_SessionHandler
 
         $params = $this->getCookieParams();
 
-        session_set_cookie_params(
-            $params['lifetime'],
-            $params['path'],
-            $params['domain'],
-            $params['secure'],
-            $params['httponly']
-        );
+        if (!headers_sent()) {
+            if (version_compare(PHP_VERSION, '7.3.0', '>=')) {
+                session_set_cookie_params([
+                    'lifetime' => $params['lifetime'],
+                    'path' => $params['path'],
+                    'domain' => $params['domain'],
+                    'secure' => $params['secure'],
+                    'httponly' => $params['httponly'],
+                    'samesite' => $params['samesite'],
+                ]);
+            } else {
+                session_set_cookie_params(
+                    $params['lifetime'],
+                    $params['path'],
+                    $params['domain'] ?? '',
+                    $params['secure'],
+                    $params['httponly']
+                );
+            }
+        }
 
         $savepath = $config->getString('session.phpsession.savepath', null);
         if (!empty($savepath)) {
@@ -309,6 +322,13 @@ class SimpleSAML_SessionHandlerPHP extends SimpleSAML_SessionHandler
 
         $ret['httponly'] = $config->getBoolean('session.phpsession.httponly', true);
 
+        if (version_compare(PHP_VERSION, '7.3.0', '<')) {
+            // in older versions of PHP we need a nasty hack to set RFC6265bis SameSite attribute
+            if ($ret['samesite'] !== null and !preg_match('/;\s+samesite/i', $ret['path'])) {
+                $ret['path'] .= '; SameSite=' . $ret['samesite'];
+            }
+        }
+
         return $ret;
     }
 
@@ -342,13 +362,18 @@ class SimpleSAML_SessionHandlerPHP extends SimpleSAML_SessionHandler
             );
         }
 
-        session_set_cookie_params(
-            $cookieParams['lifetime'],
-            $cookieParams['path'],
-            $cookieParams['domain'],
-            $cookieParams['secure'],
-            $cookieParams['httponly']
-        );
+        if (version_compare(PHP_VERSION, '7.3.0', '>=')) {
+            /** @psalm-suppress InvalidArgument */
+            session_set_cookie_params($cookieParams);
+        } else {
+            session_set_cookie_params(
+                $cookieParams['lifetime'],
+                $cookieParams['path'],
+                $cookieParams['domain'] ?? '',
+                $cookieParams['secure'],
+                $cookieParams['httponly']
+            );
+        }
 
         if (session_id() !== '') {
             // session already started, close it
