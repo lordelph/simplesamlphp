@@ -205,6 +205,19 @@ class sspmod_saml_Auth_Source_SP extends SimpleSAML_Auth_Source {
 			$ar->setIsPassive((bool)$state['isPassive']);
 		}
 
+        //backported from master
+        if (isset($state['saml:NameID'])) {
+            if (!is_array($state['saml:NameID'])) {
+                throw new \InvalidArgumentException('Invalid value of $state[\'saml:NameID\'].');
+            }
+
+            if (!array_key_exists('Value', $state['saml:NameID'])) {
+                throw new \InvalidArgumentException('$state[\'saml:NameID\'] does not contain Value element');
+            }
+
+            $ar->setNameId($state['saml:NameID']);
+        }
+        
 		if (isset($state['saml:NameIDPolicy'])) {
 			if (is_string($state['saml:NameIDPolicy'])) {
 				$policy = array(
